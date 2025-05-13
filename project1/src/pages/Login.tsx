@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import imagenDIAN from '../img/imagen_DIAN.jpg';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -26,7 +25,11 @@ export function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-        <img className="mx-auto h-12" src={imagenDIAN} alt="DIAN Logo" />
+          <img
+            className="mx-auto h-12"
+            src="/img/imagen_DIAN.jpg" 
+            alt="DIAN Logo"
+          />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sistema de Préstamos de Equipos
           </h2>

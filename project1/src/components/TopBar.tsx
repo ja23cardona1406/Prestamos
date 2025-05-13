@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { LogOut, User } from 'lucide-react';
-import imagenDIAN from '../img/imagen_DIAN.jpg'; 
 
 export function TopBar() {
   const { user, signOut } = useAuth();
@@ -11,7 +10,11 @@ export function TopBar() {
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-          <img className="mx-auto h-12" src={imagenDIAN} alt="DIAN Logo" />
+          <img
+            className="mx-auto h-12"
+            src="/img/imagen_DIAN.jpg" 
+            alt="DIAN Logo"
+          />
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
