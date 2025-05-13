@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Search, Plus, Calendar, AlertCircle, CheckCircle, XCircle, X, Edit2, Image, ChevronLeft, ChevronRight, Upload } from 'lucide-react';
-import { format } from 'date-fns';
+import { add } from 'date-fns';
+import { format } from 'date-fns-tz';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -8,6 +9,22 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import type { Loan, Equipment, FileEvidence } from '../types';
 import { fetchLoans, updateLoanStatus, createLoan, fetchEquipment, updateLoan, uploadFI1557Evidence } from '../lib/supabase';
+
+// Utility function to handle date offset
+const adjustDateOffset = (dateString: string): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  // Add one day to fix the offset issue
+  return format(add(date, { days: 1 }), 'yyyy-MM-dd');
+};
+
+// Utility function to format display dates with offset
+const formatDisplayDate = (dateString: string): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  // Add one day for display
+  return format(add(date, { days: 1 }), 'dd/MM/yyyy');
+};
 
 function LoanStatus({ status }: { status: Loan['status'] }) {
   const statusConfig = {
@@ -250,13 +267,13 @@ function Loans() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 mr-2" />
-                        {format(new Date(loan.start_date), 'dd/MM/yyyy')}
+                        {formatDisplayDate(loan.start_date)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 mr-2" />
-                        {format(new Date(loan.expected_return_date), 'dd/MM/yyyy')}
+                        {formatDisplayDate(loan.expected_return_date)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -325,7 +342,13 @@ function Loans() {
           onClose={() => setIsCreateModalOpen(false)}
           onCreateLoan={async (loanData) => {
             try {
-              await createLoan(loanData);
+              // Adjust dates before creating the loan
+              const adjustedData = {
+                ...loanData,
+                start_date: adjustDateOffset(loanData.start_date),
+                expected_return_date: adjustDateOffset(loanData.expected_return_date)
+              };
+              await createLoan(adjustedData);
               await loadLoans();
               await loadAvailableEquipment();
               setIsCreateModalOpen(false);
@@ -345,7 +368,16 @@ function Loans() {
             setIsEditModalOpen(false);
             setEditingLoan(null);
           }}
-          onSave={handleEditSubmit}
+          onSave={async (updatedLoan) => {
+            // Adjust dates before saving
+            const adjustedLoan = {
+              ...updatedLoan,
+              start_date: updatedLoan.start_date ? adjustDateOffset(updatedLoan.start_date) : undefined,
+              expected_return_date: updatedLoan.expected_return_date ? adjustDateOffset(updatedLoan.expected_return_date) : undefined,
+            };
+            
+            await handleEditSubmit(adjustedLoan);
+          }}
           availableEquipment={availableEquipment}
         />
       )}
@@ -455,6 +487,7 @@ function ImageModal({
   );
 }
 
+
 function CreateLoanModal({
   onClose,
   onCreateLoan,
@@ -464,12 +497,18 @@ function CreateLoanModal({
   onCreateLoan: (loanData: any) => Promise<void>;
   availableEquipment: Equipment[];
 }) {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const today = new Date();
+  const start = add(today, { days: 1 });
+  const expectedReturn = add(start, { days: 7 });
+
   const [formData, setFormData] = useState({
     borrower_name: '',
     borrower_department: '',
     equipment_id: '',
-    start_date: format(new Date(), 'yyyy-MM-dd'),
-    expected_return_date: format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),
+    start_date: format(start, 'yyyy-MM-dd', { timeZone }),
+    expected_return_date: format(expectedReturn, 'yyyy-MM-dd', { timeZone }),
     accessories: [] as string[],
     notes: '',
     status: 'active' as const,
@@ -690,6 +729,7 @@ function CreateLoanModal({
             >
               Cancelar
             </button>
+            
             <button
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -718,8 +758,8 @@ function EditLoanModal({
     borrower_name: loan.borrower_name,
     borrower_department: loan.borrower_department,
     equipment_id: loan.equipment_id,
-    start_date: format(new Date(loan.start_date), 'yyyy-MM-dd'),
-    expected_return_date: format(new Date(loan.expected_return_date), 'yyyy-MM-dd'),
+    start_date: format(new Date(loan.start_date + 'T12:00:00'), 'yyyy-MM-dd'),
+    expected_return_date: format(new Date(loan.expected_return_date + 'T12:00:00'), 'yyyy-MM-dd'),
     accessories: [...loan.accessories],
     notes: loan.notes || '',
     status: loan.status,

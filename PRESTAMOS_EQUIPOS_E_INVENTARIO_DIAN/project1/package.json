@@ -17,6 +17,7 @@
     "@supabase/supabase-js": "^2.39.7",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
+    "date-fns-tz": "^3.2.0",
     "dian-equipment-loan-system": "file:",
     "ionicons": "^7.4.0",
     "lucide-react": "^0.344.0",
