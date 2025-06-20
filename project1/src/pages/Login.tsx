@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import dianLogo from '../assets/imagen_DIAN.jpg';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ export function Login() {
         <div>
           <img
             className="mx-auto h-12"
-            src="/public/imagen_DIAN.jpg" 
+            src={dianLogo}
             alt="DIAN Logo"
           />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
