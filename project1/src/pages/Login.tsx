@@ -27,7 +27,7 @@ export function Login() {
         <div>
           <img
             className="mx-auto h-12"
-            src="/img/imagen_DIAN.jpg" 
+            src="/public/imagen_DIAN.jpg" 
             alt="DIAN Logo"
           />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
