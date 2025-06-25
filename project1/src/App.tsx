@@ -7,12 +7,14 @@ import { Inventory } from './pages/Inventory';
 import { Reports } from './pages/Reports';
 import { Login } from './pages/Login';
 import { AuthProvider } from './contexts/AuthContext';
+import MaintenancePage from './pages/dano';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
+          <Route path="/MaintenancePage" element={<MaintenancePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
