@@ -8,15 +8,26 @@ import { Reports } from './pages/Reports';
 import { Login } from './pages/Login';
 import { AuthProvider } from './contexts/AuthContext';
 import MaintenancePage from './pages/dano';
+import { ProtectedRoute } from './pages/ProtectedRoute';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
+          {/* Ruta pública */}
           <Route path="/MaintenancePage" element={<MaintenancePage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Layout />}>
+
+          {/* Rutas protegidas */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<Dashboard />} />
             <Route path="loans" element={<Loans />} />
             <Route path="inventory" element={<Inventory />} />
