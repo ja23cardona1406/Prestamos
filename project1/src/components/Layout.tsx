@@ -16,16 +16,28 @@ export function Layout() {
   }
 
   if (!user) {
-    return <Navigate to="/MaintenancePage" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <TopBar />
-      <div className="flex">
+    <div className="flex h-screen bg-gray-100">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex md:flex-shrink-0">
         <Sidebar />
-        <main className="flex-1 p-6">
-          <Outlet />
+      </div>
+
+      {/* Main content */}
+      <div className="flex flex-col w-0 flex-1 overflow-hidden">
+        {/* Mobile header */}
+        <TopBar />
+
+        {/* Page content */}
+        <main className="flex-1 relative overflow-y-auto focus:outline-none">
+          <div className="py-4 sm:py-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+              <Outlet />
+            </div>
+          </div>
         </main>
       </div>
     </div>

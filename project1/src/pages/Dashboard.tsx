@@ -51,7 +51,6 @@ export function Dashboard() {
   const availableEquipment = equipment.filter(eq => eq.status === 'available').length;
   const delayedLoans = loans.filter(loan => loan.status === 'delayed').length;
   
-  // Filtrar préstamos devueltos hoy
   const today = new Date().toISOString().split('T')[0];
   const returnsToday = loans.filter(loan => 
     loan.status === 'returned' && 
@@ -60,9 +59,9 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+      <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Dashboard</h1>
       
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
           title="Préstamos Activos"
           value={activeLoans.toString()}
@@ -118,15 +117,15 @@ function DashboardCard({ title, value, icon: Icon, color, href }: {
   return (
     <Link
       to={href}
-      className="block p-6 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
+      className="block p-4 sm:p-6 bg-white rounded-lg shadow hover:shadow-md transition-all transform hover:scale-105"
     >
       <div className="flex items-center">
-        <div className={`p-3 rounded-full ${colors[color as keyof typeof colors]}`}>
-          <Icon className="h-6 w-6" />
+        <div className={`p-2 sm:p-3 rounded-full ${colors[color as keyof typeof colors]}`}>
+          <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
-        <div className="ml-4">
-          <h2 className="text-sm font-medium text-gray-500">{title}</h2>
-          <p className="text-2xl font-semibold text-gray-900">{value}</p>
+        <div className="ml-3 sm:ml-4">
+          <h2 className="text-xs sm:text-sm font-medium text-gray-500">{title}</h2>
+          <p className="text-xl sm:text-2xl font-semibold text-gray-900">{value}</p>
         </div>
       </div>
     </Link>
@@ -140,22 +139,22 @@ function RecentLoansTable({ loans }: { loans: Loan[] }) {
 
   return (
     <div className="bg-white rounded-lg shadow">
-      <div className="p-6">
-        <h2 className="text-lg font-medium text-gray-900">Préstamos Recientes</h2>
-        <div className="mt-4">
+      <div className="p-4 sm:p-6">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">Préstamos Recientes</h2>
+        <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Funcionario
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Equipo
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Fecha
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Estado
                 </th>
               </tr>
@@ -163,16 +162,16 @@ function RecentLoansTable({ loans }: { loans: Loan[] }) {
             <tbody className="bg-white divide-y divide-gray-200">
               {recentLoans.map((loan) => (
                 <tr key={loan.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {loan.borrower_name}
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div className="truncate max-w-32 sm:max-w-none">{loan.borrower_name}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {loan.equipment?.model}
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <div className="truncate max-w-24 sm:max-w-none">{loan.equipment?.model}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {format(new Date(loan.created_at), 'dd/MM/yyyy')}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                     <LoanStatus status={loan.status} />
                   </td>
                 </tr>
@@ -219,24 +218,24 @@ function LowStockAlert({ equipment }: { equipment: Equipment[] }) {
 
   return (
     <div className="bg-white rounded-lg shadow">
-      <div className="p-6">
-        <h2 className="text-lg font-medium text-gray-900">Alerta de Stock Bajo</h2>
-        <div className="mt-4 space-y-4">
+      <div className="p-4 sm:p-6">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">Alerta de Stock Bajo</h2>
+        <div className="space-y-3 sm:space-y-4">
           {lowStockItems.map(({ type, count }) => (
-            <div key={type} className={`flex items-center justify-between p-4 ${count <= 2 ? 'bg-red-50' : 'bg-yellow-50'} rounded-lg`}>
+            <div key={type} className={`flex items-center justify-between p-3 sm:p-4 ${count <= 2 ? 'bg-red-50' : 'bg-yellow-50'} rounded-lg`}>
               <div className="flex items-center">
-                <AlertTriangle className={`h-5 w-5 ${count <= 2 ? 'text-red-500' : 'text-yellow-500'}`} />
-                <span className={`ml-3 text-sm ${count <= 2 ? 'text-red-700' : 'text-yellow-700'}`}>
+                <AlertTriangle className={`h-4 w-4 sm:h-5 sm:w-5 ${count <= 2 ? 'text-red-500' : 'text-yellow-500'}`} />
+                <span className={`ml-2 sm:ml-3 text-sm ${count <= 2 ? 'text-red-700' : 'text-yellow-700'}`}>
                   {type.charAt(0).toUpperCase() + type.slice(1)}s disponibles: {count} unidades
                 </span>
               </div>
             </div>
           ))}
           {lowStockItems.length === 0 && (
-            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-green-50 rounded-lg">
               <div className="flex items-center">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <span className="ml-3 text-sm text-green-700">
+                <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+                <span className="ml-2 sm:ml-3 text-sm text-green-700">
                   Todos los equipos tienen stock suficiente
                 </span>
               </div>

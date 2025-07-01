@@ -6,7 +6,7 @@ import EquipmentStatus from './EquipmentStatus';
 import ImageModal from './ImageModal';
 import EquipmentModal from './EquipmentModal';
 
-function Inventory() {
+const Inventory: React.FC = () => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -225,6 +225,6 @@ function Inventory() {
       )}
     </div>
   );
-}
+};
 
 export default Inventory;
