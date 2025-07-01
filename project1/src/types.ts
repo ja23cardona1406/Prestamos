@@ -45,6 +45,19 @@ export type Loan = {
   fi_1557_evidence: FileEvidence[] | null;
 };
 
+export interface CreateLoanData {
+  borrower_name: string;
+  borrower_department: string;
+  equipment_id: string;
+  start_date: string;
+  expected_return_date: string;
+  accessories: string[];
+  notes: string;
+  status: 'active';
+  fi_1557_filled: boolean;
+  fi_1557_evidence?: File;
+}
+
 export type Database = {
   public: {
     Tables: {
