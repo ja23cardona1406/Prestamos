@@ -8,6 +8,7 @@ import { Reports } from './pages/Reports';
 import { Login } from './pages/Login';
 import { AuthProvider } from './contexts/AuthContext';
 import MaintenancePage from './pages/dano';
+import HardwareSystem from './pages/Hardware/HardwareReports'; 
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route path="/MaintenancePage" element={<MaintenancePage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/hardware" element={<HardwareSystem />} /> 
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="loans" element={<Loans />} />

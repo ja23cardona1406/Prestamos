@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Search, Plus, Calendar, AlertCircle, CheckCircle, Edit2, Image, FileText, Eye } from 'lucide-react';
+import { Package, Search, Plus, Calendar, AlertCircle, CheckCircle, Edit2, Image, FileText, Eye, Terminal } from 'lucide-react';
 import type { Loan, Equipment } from '../../types';
 import { fetchLoans, updateLoanStatus, createLoan, fetchEquipment, updateLoan, refreshEvidenceUrls } from '../../lib/supabase';
 import { dateInputToISO, formatDisplayDate, isoToDateInput } from '../../lib/dateUtils';
@@ -8,6 +8,7 @@ import ImageModal from './ImageModal';
 import EvidenceModal from './EvidenceModal';
 import CreateLoanModal from './CreateLoanModal';
 import EditLoanModal from './EditLoanModal';
+import TerminalModal, { HardwareReport } from '../Terminal/TerminalModal';
 
 function Loans() {
   const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
@@ -18,6 +19,12 @@ function Loans() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEvidenceModalOpen, setIsEvidenceModalOpen] = useState(false);
+  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+  const [terminalConfig, setTerminalConfig] = useState<{
+    equipmentId: string;
+    equipmentModel: string;
+    mode: 'delivery' | 'return';
+  } | null>(null);
   const [editingLoan, setEditingLoan] = useState<Loan | null>(null);
   const [selectedEvidence, setSelectedEvidence] = useState<{ evidence: any[], borrowerName: string } | null>(null);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
@@ -54,7 +61,7 @@ function Loans() {
   async function handleStatusUpdate(loanId: string, newStatus: Loan['status']) {
     try {
       setError(null);
-      const actualReturnDate = (newStatus === 'returned' || newStatus === 'delayed') ? new Date().toISOString() : undefined;
+      const actualReturnDate = newStatus === 'returned' ? new Date().toISOString() : undefined;
       await updateLoanStatus(loanId, newStatus, actualReturnDate);
       await loadLoans();
       await loadAvailableEquipment();
@@ -97,6 +104,27 @@ function Loans() {
       console.error('Error loading evidence:', err);
       setError('Error al cargar las evidencias');
     }
+  };
+
+  const handleTerminalClick = (loan: Loan, mode: 'delivery' | 'return') => {
+    if (loan.equipment) {
+      setTerminalConfig({
+        equipmentId: loan.equipment.id,
+        equipmentModel: loan.equipment.model,
+        mode
+      });
+      setIsTerminalOpen(true);
+    }
+  };
+
+  const handleHardwareReportGenerated = (report: HardwareReport) => {
+    // Guardar el reporte en localStorage
+    const savedReports = localStorage.getItem('hardware_reports');
+    const allReports = savedReports ? JSON.parse(savedReports) : [];
+    allReports.push(report);
+    localStorage.setItem('hardware_reports', JSON.stringify(allReports));
+    
+    console.log('Reporte de hardware generado:', report);
   };
 
   const handleEditSubmit = async (updatedLoan: Partial<Loan>) => {
@@ -347,6 +375,13 @@ function Loans() {
                               >
                                 <AlertCircle className="h-5 w-5" />
                               </button>
+                              <button
+                                onClick={() => handleTerminalClick(loan, 'delivery')}
+                                className="text-purple-600 hover:text-purple-800 transition-colors"
+                                title="Diagnóstico de entrega"
+                              >
+                                <Terminal className="h-5 w-5" />
+                              </button>
                             </>
                           )}
                           
@@ -367,7 +402,25 @@ function Loans() {
                               >
                                 <AlertCircle className="h-5 w-5" />
                               </button>
+                              <button
+                                onClick={() => handleTerminalClick(loan, 'return')}
+                                className="text-purple-600 hover:text-purple-800 transition-colors"
+                                title="Diagnóstico de devolución"
+                              >
+                                <Terminal className="h-5 w-5" />
+                              </button>
                             </>
+                          )}
+
+                          {/* Botones para préstamos devueltos */}
+                          {loan.status === 'returned' && (
+                            <button
+                              onClick={() => handleTerminalClick(loan, 'return')}
+                              className="text-purple-600 hover:text-purple-800 transition-colors"
+                              title="Ver diagnóstico de devolución"
+                            >
+                              <Terminal className="h-5 w-5" />
+                            </button>
                           )}
                           
                           <button
@@ -455,6 +508,20 @@ function Loans() {
             setIsEvidenceModalOpen(false);
             setSelectedEvidence(null);
           }}
+        />
+      )}
+
+      {isTerminalOpen && terminalConfig && (
+        <TerminalModal
+          isOpen={isTerminalOpen}
+          onClose={() => {
+            setIsTerminalOpen(false);
+            setTerminalConfig(null);
+          }}
+          equipmentId={terminalConfig.equipmentId}
+          equipmentModel={terminalConfig.equipmentModel}
+          mode={terminalConfig.mode}
+          onReportGenerated={handleHardwareReportGenerated}
         />
       )}
     </div>
