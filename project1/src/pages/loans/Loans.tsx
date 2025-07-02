@@ -54,7 +54,7 @@ function Loans() {
   async function handleStatusUpdate(loanId: string, newStatus: Loan['status']) {
     try {
       setError(null);
-      const actualReturnDate = newStatus === 'returned' ? new Date().toISOString() : undefined;
+      const actualReturnDate = (newStatus === 'returned' || newStatus === 'delayed') ? new Date().toISOString() : undefined;
       await updateLoanStatus(loanId, newStatus, actualReturnDate);
       await loadLoans();
       await loadAvailableEquipment();
@@ -120,8 +120,16 @@ function Loans() {
     loan.borrower_department.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const activeLoans = filteredLoans.filter(loan => loan.status === 'active' || loan.status === 'delayed');
-  const loanHistory = filteredLoans.filter(loan => loan.status === 'returned' || loan.status === 'lost' || loan.status === 'damaged');
+  // Solo los préstamos 'active' son considerados activos
+  const activeLoans = filteredLoans.filter(loan => loan.status === 'active');
+  
+  // Los préstamos 'delayed' van al historial junto con returned, lost y damaged
+  const loanHistory = filteredLoans.filter(loan => 
+    loan.status === 'returned' || 
+    loan.status === 'delayed' || 
+    loan.status === 'lost' || 
+    loan.status === 'damaged'
+  );
 
   if (loading) {
     return (
@@ -322,6 +330,7 @@ function Loans() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div className="flex gap-2">
+                          {/* Botones para préstamos activos */}
                           {loan.status === 'active' && (
                             <>
                               <button
@@ -334,12 +343,33 @@ function Loans() {
                               <button
                                 onClick={() => handleStatusUpdate(loan.id, 'delayed')}
                                 className="text-red-600 hover:text-red-800 transition-colors"
-                                title="Marcar como retrasado"
+                                title="Marcar como entregado tarde"
                               >
                                 <AlertCircle className="h-5 w-5" />
                               </button>
                             </>
                           )}
+                          
+                          {/* Botones para préstamos entregados tarde */}
+                          {loan.status === 'delayed' && (
+                            <>
+                              <button
+                                onClick={() => handleStatusUpdate(loan.id, 'returned')}
+                                className="text-green-600 hover:text-green-800 transition-colors"
+                                title="Marcar como devuelto a tiempo"
+                              >
+                                <CheckCircle className="h-5 w-5" />
+                              </button>
+                              <button
+                                onClick={() => handleStatusUpdate(loan.id, 'active')}
+                                className="text-blue-600 hover:text-blue-800 transition-colors"
+                                title="Devolver a activo"
+                              >
+                                <AlertCircle className="h-5 w-5" />
+                              </button>
+                            </>
+                          )}
+                          
                           <button
                             onClick={() => handleEditClick(loan)}
                             className="text-blue-600 hover:text-blue-800 transition-colors"
