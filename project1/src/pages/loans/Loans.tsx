@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Package, Search, Plus, Calendar, AlertCircle, CheckCircle, Edit2, Image, FileText, Eye } from 'lucide-react';
 import type { Loan, Equipment } from '../../types';
 import { fetchLoans, updateLoanStatus, createLoan, fetchEquipment, updateLoan, refreshEvidenceUrls } from '../../lib/supabase';
-import { adjustDateOffset, formatDisplayDate } from '../../utils/dateUtils';
+import { dateInputToISO, formatDisplayDate, isoToDateInput } from '../../lib/dateUtils';
 import LoanStatus from './LoanStatus';
 import ImageModal from './ImageModal';
 import EvidenceModal from './EvidenceModal';
@@ -374,8 +374,8 @@ function Loans() {
             try {
               const adjustedData = {
                 ...loanData,
-                start_date: adjustDateOffset(loanData.start_date),
-                expected_return_date: adjustDateOffset(loanData.expected_return_date)
+                start_date: dateInputToISO(loanData.start_date),
+                expected_return_date: dateInputToISO(loanData.expected_return_date)
               };
               await createLoan(adjustedData);
               await loadLoans();
@@ -400,8 +400,8 @@ function Loans() {
           onSave={async (updatedLoan) => {
             const adjustedLoan = {
               ...updatedLoan,
-              start_date: updatedLoan.start_date ? adjustDateOffset(updatedLoan.start_date) : undefined,
-              expected_return_date: updatedLoan.expected_return_date ? adjustDateOffset(updatedLoan.expected_return_date) : undefined,
+              start_date: updatedLoan.start_date ? dateInputToISO(updatedLoan.start_date) : undefined,
+              expected_return_date: updatedLoan.expected_return_date ? dateInputToISO(updatedLoan.expected_return_date) : undefined,
             };
             
             await handleEditSubmit(adjustedLoan);
