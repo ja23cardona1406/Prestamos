@@ -16,7 +16,7 @@ export function Layout() {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/MaintenancePage" replace />;
   }
 
   return (
